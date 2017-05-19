@@ -3,6 +3,7 @@ package com.github.chen0040.lof;
 
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataRow;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,15 +31,19 @@ public class LOF {
     // max number for minPts;
     public int minPtsUB = 10;
     public boolean parallel = true;
-    public boolean automaticThresholding = true;
+    public boolean automaticThresholding = false;
     public double automaticThresholdingRatio = 0.05;
 
 
     private static final Logger logger = Logger.getLogger(String.valueOf(LOF.class));
 
-    public BiFunction<DataRow, DataRow, Double> distanceMeasure;
+    private BiFunction<DataRow, DataRow, Double> distanceMeasure;
+
+    @Setter(AccessLevel.NONE)
     private double minScore;
+    @Setter(AccessLevel.NONE)
     private double maxScore;
+
     private boolean addPredictedLabelAfterBatchUpdate = false;
     private DataFrame model;
 
@@ -46,8 +51,8 @@ public class LOF {
     protected void adjustThreshold(DataFrame batch){
         int m = batch.rowCount();
 
-        List<Integer> orders = new ArrayList<Integer>();
-        List<Double> probs = new ArrayList<Double>();
+        List<Integer> orders = new ArrayList<>();
+        List<Double> probs = new ArrayList<>();
 
         for(int i=0; i < m; ++i){
             DataRow tuple = batch.row(i);
@@ -58,12 +63,10 @@ public class LOF {
 
         final List<Double> probs2 = probs;
         // sort descendingly by probability values
-        Collections.sort(orders, new Comparator<Integer>() {
-            public int compare(Integer h1, Integer h2) {
-                double prob1 = probs2.get(h1);
-                double prob2 = probs2.get(h2);
-                return Double.compare(prob2, prob1);
-            }
+        Collections.sort(orders, (h1, h2) -> {
+            double prob1 = probs2.get(h1);
+            double prob2 = probs2.get(h2);
+            return Double.compare(prob2, prob1);
         });
 
         int selected_index = autoThresholdingCaps(orders.size());
@@ -89,25 +92,6 @@ public class LOF {
         return Math.max(1, (int) (automaticThresholdingRatio * m));
     }
 
-    public double getMinScore() {
-        return minScore;
-    }
-
-    public void setMinScore(double minScore) {
-        this.minScore = minScore;
-    }
-
-    public double getMaxScore() {
-        return maxScore;
-    }
-
-    public void setMaxScore(double maxScore) {
-        this.maxScore = maxScore;
-    }
-
-    public DataFrame getModel(){
-        return model;
-    }
 
     public void copy(LOF that){
         minScore = that.minScore;
