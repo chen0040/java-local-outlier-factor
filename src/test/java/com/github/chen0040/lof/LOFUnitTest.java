@@ -38,6 +38,7 @@ public class LOFUnitTest {
    }
 
    // unit testing based on example from http://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#
+   @Test
    public void testSimple(){
 
       DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
@@ -60,8 +61,8 @@ public class LOFUnitTest {
 
       DataFrame trainingData = schema.build();
 
-      trainingData = negativeSampler.sample(trainingData, 200);
-      trainingData = positiveSampler.sample(trainingData, 200);
+      trainingData = negativeSampler.sample(trainingData, 20);
+      trainingData = positiveSampler.sample(trainingData, 20);
 
       System.out.println(trainingData.head(10));
 
