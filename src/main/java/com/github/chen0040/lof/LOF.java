@@ -16,9 +16,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Created by memeanalytics on 17/8/15.
+ * Created by xschen on 17/8/15.
  * Link:
- * http://www.dbs.ifi.lmu.de/Publikationen/Papers/LOF.pdf
  */
 @Getter
 @Setter

@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 
 /**
- * Created by memeanalytics on 17/8/15.
+ * Created by xschen on 17/8/15.
  */
 public class DistanceMeasureService {
     public static double getDistance(DataFrame mgr, DataRow t1, DataRow t2, BiFunction<DataRow, DataRow, Double> distance){

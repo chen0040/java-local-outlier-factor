@@ -11,6 +11,18 @@ Package implements a number local outlier factor algorithms for outlier detectio
 * LOCI (WIP)
 * CBLOF (Cluster-based LOF)
 
+# Install
+
+Add the following dependency to your POM file:
+
+```xml
+<dependency>
+  <groupId>com.github.chen0040</groupId>
+  <artifactId>java-local-outlier-factor</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
 
 # Usage
 

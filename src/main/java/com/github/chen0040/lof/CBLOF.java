@@ -16,9 +16,7 @@ import java.util.List;
 
 
 /**
- * Created by memeanalytics on 18/8/15.
- * Link:
- * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.20.4242&rep=rep1&type=pdf
+ * Created by xschen on 18/8/15.
  */
 @Getter
 @Setter

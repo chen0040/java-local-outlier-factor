@@ -6,14 +6,14 @@
 
     <groupId>com.github.chen0040</groupId>
     <artifactId>java-local-outlier-factor</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
 
 
     <licenses>
         <license>
             <name>MIT</name>
-            <url>https://github.com/chen0040/java-local-outlier-factor/LICENSE</url>
+            <url>https://github.com/chen0040/java-local-outlier-factor/blob/master/LICENSE</url>
             <comments>MIT License</comments>
         </license>
     </licenses>
