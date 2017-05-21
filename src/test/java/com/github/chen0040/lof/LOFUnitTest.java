@@ -73,8 +73,8 @@ public class LOFUnitTest {
 
       LOF method = new LOF();
       method.setMinPtsLB(3);
-      method.setMinPtsUB(15);
-      method.setThreshold(0.2);
+      method.setMinPtsUB(7);
+      method.setThreshold(0.5);
       method.fitAndTransform(trainingData);
 
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
