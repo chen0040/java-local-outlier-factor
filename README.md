@@ -9,7 +9,7 @@ Package implements a number local outlier factor algorithms for outlier detectio
 * LOF
 * LDOF (WIP)
 * LOCI (WIP)
-* CBLOF (WIP)
+* CBLOF (Cluster-based LOF)
 
 
 # Usage
@@ -19,7 +19,7 @@ The anomaly detection algorithms takes data that is prepared and stored in a dat
 The following method trains an algorithm:
 
 ```java
-lof.fit(dataFrame);
+lof.fitAndTransform(dataFrame);
 ```
 
 The following method returns true if the dataRow (which is a row in a data frame) taken in is an outlier:
@@ -28,7 +28,43 @@ The following method returns true if the dataRow (which is a row in a data frame
 boolean isOutlier = lof.isAnomaly(dataRow);
 ```
 
-# Local Outlier Factor
+### Local Outlier Factor (LOF)
+
+The create and train the LOF, run the following code:
+
+```java
+LOF method = new LOF();
+method.setMinPtsLB(3);
+method.setMinPtsUB(15);
+method.setThreshold(0.2);
+DataFrame resultantTrainedData = method.fitAndTransform(trainingData);
+System.out.println(resultantTrainedData.head(10));
+```
+
+ 
+To test the trained method on new data, run:
+
+```java
+boolean outlier = method.isAnomaly(dataRow);
+```
+
+### Cluster-Based Local Outlier Factor (CBLOF)
+
+The create and train the LOF, run the following code:
+
+```java
+CBLOF method = new CBLOF();
+DataFrame resultantTrainedData = method.fitAndTransform(trainingData);
+System.out.println(resultantTrainedData.head(10));
+```
+ 
+To test the trained method on new data, run:
+
+```java
+boolean outlier = method.isAnomaly(dataRow);
+```
+
+### Complete sample code for LOF
 
 The problem that we will be using as demo as the following anomaly detection problem:
 

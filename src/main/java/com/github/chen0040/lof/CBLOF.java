@@ -5,6 +5,9 @@ import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataRow;
 import com.github.chen0040.data.utils.CountRepository;
 import com.github.chen0040.data.utils.discretizers.KMeansDiscretizer;
+import lombok.AccessLevel;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,7 +23,9 @@ public class CBLOF {
 
     private ArrayList<Cluster> clusters;
 
-    private KMeansDiscretizer inputDiscretizer;
+    @Setter(AccessLevel.NONE)
+    private KMeansDiscretizer discretizer;
+
     private int split;
 
     public double threshold;
@@ -34,7 +39,7 @@ public class CBLOF {
     public void copy(CBLOF that){
         
         split = that.split;
-        inputDiscretizer = that.inputDiscretizer == null ? null : that.inputDiscretizer.makeCopy();
+        discretizer = that.discretizer == null ? null : that.discretizer.makeCopy();
 
         clusters = null;
         if(that.clusters != null){
@@ -57,7 +62,7 @@ public class CBLOF {
         super();
         KMeansDiscretizer d = new KMeansDiscretizer();
         d.setMaxLevelCount(10);
-        inputDiscretizer = d;
+        discretizer = d;
         threshold = 0.5;
         alpha = 0.8;
         beta = 0.1;
@@ -117,7 +122,7 @@ public class CBLOF {
     }
 
     public DataFrame fitAndTransform(DataFrame frame) {
-        DataFrame dataFrame = inputDiscretizer.fitAndTransform(frame);
+        DataFrame dataFrame = discretizer.fitAndTransform(frame);
 
         runSqueezer(dataFrame, similarityThreshold);
 
@@ -210,7 +215,7 @@ public class CBLOF {
     // the higher the CBLOF, the more likely the tuple is an outlier
 
     public double transform(DataRow row) {
-        row = inputDiscretizer.transform(row);
+        row = discretizer.transform(row);
         double CBLOF;
 
         double maxSim = Double.MIN_VALUE;
