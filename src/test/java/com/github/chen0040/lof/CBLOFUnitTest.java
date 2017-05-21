@@ -70,10 +70,11 @@ public class CBLOFUnitTest {
 
       DataFrame crossValidationData = schema.build();
 
-      crossValidationData = negativeSampler.sample(crossValidationData, 40);
-      crossValidationData = positiveSampler.sample(crossValidationData, 40);
+      crossValidationData = negativeSampler.sample(crossValidationData, 10);
+      crossValidationData = positiveSampler.sample(crossValidationData, 10);
 
       CBLOF method = new CBLOF();
+      method.setParallel(false);
       method.fitAndTransform(trainingData);
 
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();

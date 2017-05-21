@@ -68,10 +68,11 @@ public class LOFUnitTest {
 
       DataFrame crossValidationData = schema.build();
 
-      crossValidationData = negativeSampler.sample(crossValidationData, 40);
-      crossValidationData = positiveSampler.sample(crossValidationData, 40);
+      crossValidationData = negativeSampler.sample(crossValidationData, 10);
+      crossValidationData = positiveSampler.sample(crossValidationData, 10);
 
       LOF method = new LOF();
+      method.setParallel(false);
       method.setMinPtsLB(3);
       method.setMinPtsUB(7);
       method.setThreshold(0.5);

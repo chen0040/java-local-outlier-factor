@@ -6,6 +6,7 @@ import com.github.chen0040.data.frame.DataRow;
 import com.github.chen0040.data.utils.CountRepository;
 import com.github.chen0040.data.utils.discretizers.KMeansDiscretizer;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.List;
  * Link:
  * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.20.4242&rep=rep1&type=pdf
  */
+@Getter
+@Setter
 public class CBLOF {
 
     private ArrayList<Cluster> clusters;
