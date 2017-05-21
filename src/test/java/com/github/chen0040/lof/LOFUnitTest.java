@@ -38,7 +38,6 @@ public class LOFUnitTest {
    }
 
    // unit testing based on example from http://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#
-   @Test
    public void testSimple(){
 
       DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()

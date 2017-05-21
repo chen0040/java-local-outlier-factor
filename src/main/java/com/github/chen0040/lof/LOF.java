@@ -331,7 +331,7 @@ public class LOF {
         return lof;
     }
 
-    public class MinPtsBounds{
+    private static class MinPtsBounds{
         private int lowerBound;
         private int upperBound;
 
