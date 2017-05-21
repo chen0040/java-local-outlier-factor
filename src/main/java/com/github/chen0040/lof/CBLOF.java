@@ -53,8 +53,7 @@ public class CBLOF {
         }
     }
 
-    @Override
-    public Object clone(){
+    public CBLOF makeCopy(){
         CBLOF clone = new CBLOF();
         clone.copy(this);
 
@@ -332,13 +331,4 @@ public class CBLOF {
         }
     }
 
-    private class TupleMetaData{
-        public Cluster cluster;
-        public double CBLOF;
-
-        public TupleMetaData(Cluster cluster, double lof){
-            this.cluster = cluster;
-            this.CBLOF = lof;
-        }
-    }
 }

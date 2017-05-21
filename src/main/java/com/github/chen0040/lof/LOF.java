@@ -3,6 +3,7 @@ package com.github.chen0040.lof;
 
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataRow;
+import com.github.chen0040.data.utils.TupleTwo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -286,10 +287,8 @@ public class LOF {
     }
 
     public double k_distance(DataFrame batch, DataRow o, int k){
-        Object[] result = DistanceMeasureService.getKthNearestNeighbor(batch, o, k, distanceMeasure);
-        //DataRow o_k = (DataRow)result[0];
-        double k_distance = (Double)result[1];
-        return k_distance;
+        TupleTwo<DataRow, Double> kth = DistanceMeasureService.getKthNearestNeighbor(batch, o, k, distanceMeasure);
+        return kth._2();
     }
 
     private double reach_dist(DataFrame batch, DataRow p, DataRow o, int k){
@@ -299,15 +298,15 @@ public class LOF {
     }
 
     private double local_reachability_density(DataFrame batch, DataRow p, int k){
-        Map<DataRow, Double> knn_p = DistanceMeasureService.getKNearestNeighbors(batch, p, k, distanceMeasure);
+        List<TupleTwo<DataRow, Double>> knn_p = DistanceMeasureService.getKNearestNeighbors(batch, p, k, distanceMeasure);
         double density = local_reachability_density(batch, p, k, knn_p);
         return density;
     }
 
-    private double local_reachability_density(DataFrame batch, DataRow p, int k, Map<DataRow, Double> knn_p){
+    private double local_reachability_density(DataFrame batch, DataRow p, int k, List<TupleTwo<DataRow, Double>> knn_p){
         double sum_reach_dist = 0;
-        for(DataRow o : knn_p.keySet()){
-            sum_reach_dist += reach_dist(batch, p, o, k);
+        for(TupleTwo<DataRow, Double> o : knn_p){
+            sum_reach_dist += reach_dist(batch, p, o._1(), k);
         }
         double density = 1 / (sum_reach_dist / knn_p.size());
         return density;
@@ -316,15 +315,15 @@ public class LOF {
     // the higher this value, the more likely the point is an outlier
     public double local_outlier_factor(DataFrame batch, DataRow p, int k){
 
-        Map<DataRow, Double> knn_p = DistanceMeasureService.getKNearestNeighbors(batch, p, k, distanceMeasure);
+        List<TupleTwo<DataRow, Double>> knn_p = DistanceMeasureService.getKNearestNeighbors(batch, p, k, distanceMeasure);
         double lrd_p = local_reachability_density(batch, p, k, knn_p);
         double sum_lrd = 0;
-        for(DataRow o : knn_p.keySet()){
-            sum_lrd += local_reachability_density(batch, o, k);
+        for(TupleTwo<DataRow,Double> o : knn_p){
+            sum_lrd += local_reachability_density(batch, o._1(), k);
         }
 
         if(Double.isInfinite(sum_lrd) && Double.isInfinite(lrd_p)){
-            return 1 / knn_p.size();
+            return 1.0 / knn_p.size();
         }
 
         double lof = (sum_lrd / lrd_p) / knn_p.size();

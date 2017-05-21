@@ -72,9 +72,9 @@ public class LOFUnitTest {
       crossValidationData = positiveSampler.sample(crossValidationData, 10);
 
       LOF method = new LOF();
-      method.setParallel(false);
+      method.setParallel(true);
       method.setMinPtsLB(3);
-      method.setMinPtsUB(7);
+      method.setMinPtsUB(10);
       method.setThreshold(0.5);
       method.fitAndTransform(trainingData);
 

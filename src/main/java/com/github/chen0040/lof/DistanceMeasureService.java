@@ -2,8 +2,11 @@ package com.github.chen0040.lof;
 
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataRow;
+import com.github.chen0040.data.utils.TupleTwo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -31,49 +34,32 @@ public class DistanceMeasureService {
         return Math.sqrt(cross_prod);
     }
 
-    public static Map<DataRow, Double> getKNearestNeighbors(DataFrame batch, DataRow t, int k, BiFunction<DataRow, DataRow, Double> distanceMeasure){
-        Map<DataRow, Double> neighbors = new HashMap<DataRow, Double>();
-        for(int i = 0; i < batch.rowCount(); ++i){
+    public static List<TupleTwo<DataRow, Double>> getKNearestNeighbors(DataFrame batch, DataRow t, int k, BiFunction<DataRow, DataRow, Double> distanceMeasure){
+
+        MinPQ<DataRow> minPQ = new MinPQ<>();
+
+        int N = batch.rowCount();
+        for(int i = 0; i < N; ++i){
 
             DataRow ti = batch.row(i);
             if(ti == t) continue;
             double distance = getDistance(batch, ti, t, distanceMeasure);
-            if(neighbors.size() < k){
-                neighbors.put(ti, distance);
-            }else{
-                double largest_distance = Double.MIN_VALUE;
-                DataRow neighbor_with_largest_distance = null;
-                for(DataRow tj : neighbors.keySet()){
-                    double tj_distance = neighbors.get(tj);
-                    if(tj_distance > largest_distance){
-                        largest_distance =tj_distance;
-                        neighbor_with_largest_distance = tj;
-                    }
-                }
+            minPQ.enqueue(ti, distance);
+        }
 
-                if(largest_distance > distance){
-                    neighbors.remove(neighbor_with_largest_distance);
-                    neighbors.put(ti, distance);
-                }
-            }
+        List<TupleTwo<DataRow, Double>> neighbors = new ArrayList<>();
+        int m = Math.min(k, N);
+        for(int i=0; i < m; ++i){
+            TupleTwo<DataRow, Double> tuple = minPQ.delMin();
+            neighbors.add(tuple);
         }
 
         return neighbors;
     }
 
-    public static Object[] getKthNearestNeighbor(DataFrame batch, DataRow tuple, int k, BiFunction<DataRow, DataRow, Double> distanceMeasure) {
-        Map<DataRow,Double> neighbors = getKNearestNeighbors(batch, tuple, k, distanceMeasure);
+    public static TupleTwo<DataRow, Double> getKthNearestNeighbor(DataFrame batch, DataRow tuple, int k, BiFunction<DataRow, DataRow, Double> distanceMeasure) {
+        List<TupleTwo<DataRow,Double>> neighbors = getKNearestNeighbors(batch, tuple, k, distanceMeasure);
 
-        double largest_distance = Double.MIN_VALUE;
-        DataRow neighbor_with_largest_distance = null;
-        for(DataRow tj : neighbors.keySet()){
-            double tj_distance = neighbors.get(tj);
-            if(tj_distance > largest_distance){
-                largest_distance =tj_distance;
-                neighbor_with_largest_distance = tj;
-            }
-        }
-
-        return new Object[] {neighbor_with_largest_distance, largest_distance};
+        return neighbors.get(neighbors.size()-1);
     }
 }
