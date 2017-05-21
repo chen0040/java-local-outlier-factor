@@ -44,7 +44,6 @@ public class LOF {
     @Setter(AccessLevel.NONE)
     private double maxScore;
 
-    private boolean addPredictedLabelAfterBatchUpdate = false;
     private DataFrame model;
 
 
@@ -97,7 +96,6 @@ public class LOF {
         minScore = that.minScore;
         maxScore = that.maxScore;
         distanceMeasure = that.distanceMeasure;
-        addPredictedLabelAfterBatchUpdate = that.addPredictedLabelAfterBatchUpdate;
         model = that.model == null ? null : that.model.makeCopy();
     }
 
@@ -146,7 +144,7 @@ public class LOF {
 
 
 
-    public void fit(DataFrame batch) {
+    public DataFrame fitAndTransform(DataFrame batch) {
         this.model = batch.makeCopy();
 
         int m = model.rowCount();
@@ -190,13 +188,13 @@ public class LOF {
             adjustThreshold(model);
         }
 
-        if(addPredictedLabelAfterBatchUpdate){
-            for(int i=0; i < m; ++i){
-                DataRow tuple = model.row(i);
-                double score_lof = evaluate(tuple, batch);
-                tuple.setCategoricalTargetCell("label", score_lof > threshold ? "OUTLIER" : "NORMAL");
-            }
+        for(int i=0; i < m; ++i){
+            DataRow tuple = model.row(i);
+            double score_lof = evaluate(tuple, batch);
+            tuple.setCategoricalTargetCell("cluster", score_lof > threshold ? "OUTLIER" : "NORMAL");
         }
+
+        return this.model;
     }
 
     private class LOFTask implements Callable<Double>{

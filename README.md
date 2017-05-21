@@ -30,6 +30,10 @@ boolean isOutlier = lof.isAnomaly(dataRow);
 
 # Local Outlier Factor
 
+The problem that we will be using as demo as the following anomaly detection problem:
+
+![scki-learn example for one-class](http://scikit-learn.org/stable/_images/sphx_glr_plot_oneclass_001.png)
+
 Below is the sample code which illustrates how to use LOF to detect outliers in the above problem:
 
 ```java
@@ -68,7 +72,7 @@ LOF method = new LOF();
 method.setMinPtsLB(3);
 method.setMinPtsUB(15);
 method.setThreshold(0.2);
-method.fit(trainingData);
+method.fitAndTransform(trainingData);
 
 BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
 

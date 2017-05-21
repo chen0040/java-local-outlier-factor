@@ -11,13 +11,15 @@ import org.testng.annotations.Test;
 
 import java.util.Random;
 
+import static org.testng.Assert.*;
+
 
 /**
- * Created by xschen on 19/5/2017.
+ * Created by xschen on 21/5/2017.
  */
-public class LOFUnitTest {
+public class CBLOFUnitTest {
 
-   private static final Logger logger = LoggerFactory.getLogger(LOFUnitTest.class);
+   private static final Logger logger = LoggerFactory.getLogger(CBLOFUnitTest.class);
 
    private static Random random = new Random();
 
@@ -71,10 +73,7 @@ public class LOFUnitTest {
       crossValidationData = negativeSampler.sample(crossValidationData, 40);
       crossValidationData = positiveSampler.sample(crossValidationData, 40);
 
-      LOF method = new LOF();
-      method.setMinPtsLB(3);
-      method.setMinPtsUB(15);
-      method.setThreshold(0.2);
+      CBLOF method = new CBLOF();
       method.fitAndTransform(trainingData);
 
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
