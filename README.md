@@ -28,6 +28,8 @@ Add the following dependency to your POM file:
 
 The anomaly detection algorithms takes data that is prepared and stored in a data frame (Please refers to this [link](https://github.com/chen0040/java-data-frame) on how to create a data frame from file or from scratch)
 
+All LOF algorithms variants use unsupervised-learning for training.
+
 The following method trains an algorithm:
 
 ```java
@@ -42,7 +44,7 @@ boolean isOutlier = lof.isAnomaly(dataRow);
 
 ### Local Outlier Factor (LOF)
 
-The create and train the LOF, run the following code:
+To create and train the LOF, run the following code:
 
 ```java
 LOF method = new LOF();
