@@ -191,7 +191,7 @@ public class LOF {
         for(int i=0; i < m; ++i){
             DataRow tuple = model.row(i);
             double score_lof = evaluate(tuple, batch);
-            tuple.setCategoricalTargetCell("cluster", score_lof > threshold ? "OUTLIER" : "NORMAL");
+            tuple.setCategoricalTargetCell("anomaly", score_lof > threshold ? "1" : "0");
         }
 
         return this.model;

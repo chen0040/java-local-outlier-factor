@@ -59,30 +59,25 @@ public class LOFUnitTest {
               .forColumn("anomaly").generate((name, index) -> 1.0)
               .end();
 
-      DataFrame trainingData = schema.build();
+      DataFrame data = schema.build();
 
-      trainingData = negativeSampler.sample(trainingData, 20);
-      trainingData = positiveSampler.sample(trainingData, 20);
+      data = negativeSampler.sample(data, 20);
+      data = positiveSampler.sample(data, 20);
 
-      System.out.println(trainingData.head(10));
-
-      DataFrame crossValidationData = schema.build();
-
-      crossValidationData = negativeSampler.sample(crossValidationData, 10);
-      crossValidationData = positiveSampler.sample(crossValidationData, 10);
+      System.out.println(data.head(10));
 
       LOF method = new LOF();
       method.setParallel(true);
       method.setMinPtsLB(3);
       method.setMinPtsUB(10);
       method.setThreshold(0.5);
-      method.fitAndTransform(trainingData);
+      DataFrame learnedData = method.fitAndTransform(data);
 
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
 
-      for(int i = 0; i < crossValidationData.rowCount(); ++i){
-         boolean predicted = method.isAnomaly(crossValidationData.row(i));
-         boolean actual = crossValidationData.row(i).target() > 0.5;
+      for(int i = 0; i < learnedData.rowCount(); ++i){
+         boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
+         boolean actual = data.row(i).target() == 1.0;
          evaluator.evaluate(actual, predicted);
          logger.info("predicted: {}\texpected: {}", predicted, actual);
       }

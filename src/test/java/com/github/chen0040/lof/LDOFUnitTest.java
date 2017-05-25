@@ -11,15 +11,13 @@ import org.testng.annotations.Test;
 
 import java.util.Random;
 
-import static org.testng.Assert.*;
-
 
 /**
- * Created by xschen on 21/5/2017.
+ * Created by xschen on 19/5/2017.
  */
-public class CBLOFUnitTest {
+public class LDOFUnitTest {
 
-   private static final Logger logger = LoggerFactory.getLogger(CBLOFUnitTest.class);
+   private static final Logger logger = LoggerFactory.getLogger(LDOFUnitTest.class);
 
    private static Random random = new Random();
 
@@ -63,21 +61,19 @@ public class CBLOFUnitTest {
 
       DataFrame data = schema.build();
 
-      data = negativeSampler.sample(data, 200);
-      data = positiveSampler.sample(data, 200);
+      data = negativeSampler.sample(data, 20);
+      data = positiveSampler.sample(data, 20);
 
       System.out.println(data.head(10));
 
-
-      CBLOF method = new CBLOF();
-      method.setParallel(false);
+      LDOF method = new LDOF();
       DataFrame learnedData = method.fitAndTransform(data);
 
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
-
-      for(int i = 0; i < learnedData.rowCount(); ++i){
+      for(int i = 0; i < learnedData.rowCount(); ++i) {
          boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
          boolean actual = data.row(i).target() == 1.0;
+
          evaluator.evaluate(actual, predicted);
          logger.info("predicted: {}\texpected: {}", predicted, actual);
       }

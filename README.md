@@ -7,7 +7,7 @@ Package implements a number local outlier factor algorithms for outlier detectio
 # Features
 
 * LOF
-* LDOF (WIP)
+* LDOF (Local Distance Outlier Factor)
 * LOCI (WIP)
 * CBLOF (Cluster-based LOF)
 
@@ -19,7 +19,7 @@ Add the following dependency to your POM file:
 <dependency>
   <groupId>com.github.chen0040</groupId>
   <artifactId>java-local-outlier-factor</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 
@@ -78,16 +78,16 @@ To test the trained method on new data, run:
 boolean outlier = method.isAnomaly(dataRow);
 ```
 
-### Complete sample code for LOF
-
 The problem that we will be using as demo as the following anomaly detection problem:
 
 ![scki-learn example for one-class](http://scikit-learn.org/stable/_images/sphx_glr_plot_oneclass_001.png)
 
+
+### LOF 
+
 Below is the sample code which illustrates how to use LOF to detect outliers in the above problem:
 
 ```java
-
 DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
       .newInput("c1")
       .newInput("c2")
@@ -106,29 +106,115 @@ Sampler.DataSampleBuilder positiveSampler = new Sampler()
       .forColumn("anomaly").generate((name, index) -> 1.0)
       .end();
 
-DataFrame trainingData = schema.build();
+DataFrame data = schema.build();
 
-trainingData = negativeSampler.sample(trainingData, 200);
-trainingData = positiveSampler.sample(trainingData, 200);
+data = negativeSampler.sample(data, 20);
+data = positiveSampler.sample(data, 20);
 
-System.out.println(trainingData.head(10));
-
-DataFrame crossValidationData = schema.build();
-
-crossValidationData = negativeSampler.sample(crossValidationData, 40);
-crossValidationData = positiveSampler.sample(crossValidationData, 40);
+System.out.println(data.head(10));
 
 LOF method = new LOF();
+method.setParallel(true);
 method.setMinPtsLB(3);
-method.setMinPtsUB(15);
-method.setThreshold(0.2);
-method.fitAndTransform(trainingData);
+method.setMinPtsUB(10);
+method.setThreshold(0.5);
+DataFrame learnedData = method.fitAndTransform(data);
 
 BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
 
-for(int i = 0; i < crossValidationData.rowCount(); ++i){
- boolean predicted = method.isAnomaly(crossValidationData.row(i));
- boolean actual = crossValidationData.row(i).target() > 0.5;
+for(int i = 0; i < learnedData.rowCount(); ++i){
+ boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
+ boolean actual = data.row(i).target() == 1.0;
+ evaluator.evaluate(actual, predicted);
+ logger.info("predicted: {}\texpected: {}", predicted, actual);
+}
+```
+
+### Cluster-Based LOF 
+
+Below is the sample code which illustrates how to use CBLOF to detect outliers in the above problem:
+
+```java
+DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
+      .newInput("c1")
+      .newInput("c2")
+      .newOutput("anomaly")
+      .end();
+
+Sampler.DataSampleBuilder negativeSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("c2").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("anomaly").generate((name, index) -> 0.0)
+      .end();
+
+Sampler.DataSampleBuilder positiveSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> rand(-4, 4))
+      .forColumn("c2").generate((name, index) -> rand(-4, 4))
+      .forColumn("anomaly").generate((name, index) -> 1.0)
+      .end();
+
+DataFrame data = schema.build();
+
+data = negativeSampler.sample(data, 200);
+data = positiveSampler.sample(data, 200);
+
+System.out.println(data.head(10));
+
+
+CBLOF method = new CBLOF();
+method.setParallel(false);
+DataFrame learnedData = method.fitAndTransform(data);
+
+BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
+
+for(int i = 0; i < learnedData.rowCount(); ++i){
+ boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
+ boolean actual = data.row(i).target() == 1.0;
+ evaluator.evaluate(actual, predicted);
+ logger.info("predicted: {}\texpected: {}", predicted, actual);
+}
+
+evaluator.report();
+```
+
+### LDOF
+
+Below is the sample code which illustrates how to use LDOF to detect outliers in the above problem:
+
+```java
+DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
+      .newInput("c1")
+      .newInput("c2")
+      .newOutput("anomaly")
+      .end();
+
+Sampler.DataSampleBuilder negativeSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("c2").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("anomaly").generate((name, index) -> 0.0)
+      .end();
+
+Sampler.DataSampleBuilder positiveSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> rand(-4, 4))
+      .forColumn("c2").generate((name, index) -> rand(-4, 4))
+      .forColumn("anomaly").generate((name, index) -> 1.0)
+      .end();
+
+DataFrame data = schema.build();
+
+data = negativeSampler.sample(data, 20);
+data = positiveSampler.sample(data, 20);
+
+System.out.println(data.head(10));
+
+LDOF method = new LDOF();
+DataFrame learnedData = method.fitAndTransform(data);
+
+BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
+for(int i = 0; i < learnedData.rowCount(); ++i) {
+ boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
+ boolean actual = data.row(i).target() == 1.0;
+
  evaluator.evaluate(actual, predicted);
  logger.info("predicted: {}\texpected: {}", predicted, actual);
 }

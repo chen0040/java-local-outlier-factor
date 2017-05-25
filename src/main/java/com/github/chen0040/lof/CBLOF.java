@@ -175,6 +175,12 @@ public class CBLOF {
             adjustThreshold(dataFrame);
         }
 
+        for(int i=0; i < m; ++i){
+            DataRow tuple = dataFrame.row(i);
+            double score_lof = transform(tuple);
+            tuple.setCategoricalTargetCell("anomaly", score_lof > threshold ? "1" : "0");
+        }
+
         return dataFrame;
     }
 
