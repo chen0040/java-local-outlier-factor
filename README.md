@@ -7,7 +7,7 @@ Package implements a number local outlier factor algorithms for outlier detectio
 # Features
 
 * LOF
-* LDOF (Local Distance Outlier Factor)
+* LDOF (Local Density Outlier Factor)
 * LOCI (WIP)
 * CBLOF (Cluster-based LOF)
 
