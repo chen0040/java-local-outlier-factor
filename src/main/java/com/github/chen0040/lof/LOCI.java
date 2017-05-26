@@ -2,6 +2,9 @@ package com.github.chen0040.lof;
 
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataRow;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,13 +16,18 @@ import java.util.function.BiFunction;
 /**
  * Created by xschen on 23/8/15.
  */
+@Getter
+@Setter
 public class LOCI implements Cloneable {
+    @Setter(AccessLevel.NONE)
     private double r_max;
 
-    private double alpha;
-    private double k_sigma;
+    private double alpha = 0.5;
+    private double k_sigma = 3;
 
+    @Setter(AccessLevel.NONE)
     private double[][] distanceMatrix;
+
     private BiFunction<DataRow, DataRow, Double> distanceMeasure;
 
     public void copy(LOCI that){
@@ -39,8 +47,6 @@ public class LOCI implements Cloneable {
     }
 
     public LOCI(){
-       alpha = 0.5;
-        k_sigma = 3;
     }
 
     public DataFrame fitAndTransform(DataFrame batch) {
