@@ -19,7 +19,7 @@ Add the following dependency to your POM file:
 <dependency>
   <groupId>com.github.chen0040</groupId>
   <artifactId>java-local-outlier-factor</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
@@ -220,4 +220,49 @@ for(int i = 0; i < learnedData.rowCount(); ++i) {
 }
 
 evaluator.report();
+```
+
+### LOCI
+
+Below is the sample code which illustrates how to use LOCI to detect outliers in the above problem:
+
+```java
+DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
+      .newInput("c1")
+      .newInput("c2")
+      .newOutput("anomaly")
+      .end();
+
+Sampler.DataSampleBuilder negativeSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("c2").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
+      .forColumn("anomaly").generate((name, index) -> 0.0)
+      .end();
+
+Sampler.DataSampleBuilder positiveSampler = new Sampler()
+      .forColumn("c1").generate((name, index) -> rand(-4, 4))
+      .forColumn("c2").generate((name, index) -> rand(-4, 4))
+      .forColumn("anomaly").generate((name, index) -> 1.0)
+      .end();
+
+DataFrame data = schema.build();
+
+data = negativeSampler.sample(data, 20);
+data = positiveSampler.sample(data, 20);
+
+System.out.println(data.head(10));
+
+LOCI method = new LOCI();
+method.setAlpha(0.5);
+method.setKSigma(3);
+DataFrame learnedData = method.fitAndTransform(data);
+
+BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
+
+for(int i = 0; i < learnedData.rowCount(); ++i){
+ boolean predicted = learnedData.row(i).categoricalTarget().equals("1");
+ boolean actual = data.row(i).target() == 1.0;
+ evaluator.evaluate(actual, predicted);
+ logger.info("predicted: {}\texpected: {}", predicted, actual);
+}
 ```

@@ -23,7 +23,7 @@ public class LOCI implements Cloneable {
     private double r_max;
 
     private double alpha = 0.5;
-    private double k_sigma = 3;
+    private double kSigma = 3;
 
     @Setter(AccessLevel.NONE)
     private double[][] distanceMatrix;
@@ -33,7 +33,7 @@ public class LOCI implements Cloneable {
     public void copy(LOCI that){
         r_max = that.r_max;
         alpha = that.alpha;
-        k_sigma = that.k_sigma;
+        kSigma = that.kSigma;
         distanceMatrix = that.distanceMatrix == null ? null : that.distanceMatrix.clone();
         distanceMeasure = that.distanceMeasure;
     }
@@ -93,7 +93,7 @@ public class LOCI implements Cloneable {
                 double MDEF = 1 - n_pi_alphar / nhat_pi_r_alpha;
                 double sigma_MDEF = sigma_nhat_pi_r_alpha / nhat_pi_r_alpha;
 
-                if(MDEF  >  k_sigma *sigma_MDEF){
+                if(MDEF  >  kSigma *sigma_MDEF){
                     isOutlier = true;
                     break;
                 }
@@ -160,15 +160,5 @@ public class LOCI implements Cloneable {
         return rnn;
     }
 
-    public void sort_r_neighbors(final int i, List<Integer> rnn, final double[][] distanceMatrix){
-        // sort ascendingly based on critical distance
-        Collections.sort(rnn, new Comparator<Integer>() {
-            public int compare(Integer o1, Integer o2) {
-                double critical_distance_1 = distanceMatrix[i][o1];
-                double critical_distance_2 = distanceMatrix[i][o2];
 
-                return Double.compare(critical_distance_1, critical_distance_2);
-            }
-        });
-    }
 }
