@@ -55,7 +55,7 @@ public class LOF {
 
         for(int i=0; i < m; ++i){
             DataRow tuple = batch.row(i);
-            double prob = evaluate(tuple, model);
+            double prob = evaluate(tuple);
             probs.add(prob);
             orders.add(i);
         }
@@ -92,24 +92,6 @@ public class LOF {
     }
 
 
-    public void copy(LOF that){
-        minScore = that.minScore;
-        maxScore = that.maxScore;
-        distanceMeasure = that.distanceMeasure;
-        model = that.model == null ? null : that.model.makeCopy();
-    }
-
-    public LOF makeCopy(){
-        LOF clone = new LOF();
-        clone.copy(this);
-
-        return clone;
-    }
-
-    public MinPtsBounds searchRange() {
-        return new MinPtsBounds(minPtsLB, minPtsUB);
-    }
-
     public void setSearchRange(int minPtsLB, int minPtsUB) {
         this.minPtsLB = minPtsLB;
         this.minPtsUB = minPtsUB;
@@ -119,12 +101,8 @@ public class LOF {
         return distanceMeasure;
     }
 
-    public void setDistanceMeasure(BiFunction<DataRow, DataRow, Double> distanceMeasure) {
-        this.distanceMeasure = distanceMeasure;
-    }
-
     public boolean isAnomaly(DataRow tuple) {
-        double score_lof = evaluate(tuple, model);
+        double score_lof = evaluate(tuple);
         return score_lof > threshold;
     }
 
@@ -190,8 +168,7 @@ public class LOF {
 
         for(int i=0; i < m; ++i){
             DataRow tuple = model.row(i);
-            double score_lof = evaluate(tuple, batch);
-            tuple.setCategoricalTargetCell("anomaly", score_lof > threshold ? "1" : "0");
+            tuple.setCategoricalTargetCell("anomaly", isAnomaly(tuple) ? "1" : "0");
         }
 
         return this.model;
@@ -236,7 +213,7 @@ public class LOF {
 
         ExecutorService executor = Executors.newFixedThreadPool(Math.min(8, minPtsUB - minPtsLB + 1));
 
-        List<LOFTask> tasks = new ArrayList<LOFTask>();
+        List<LOFTask> tasks = new ArrayList<>();
         for(int minPts = minPtsLB; minPts <= minPtsUB; ++minPts) { // the number of nearest neighbors used in defining the local neighborhood of the object.
             tasks.add(new LOFTask(batch, tuple, minPts));
         }
@@ -257,7 +234,7 @@ public class LOF {
         return maxLOF;
     }
 
-    public double evaluate(DataRow tuple, DataFrame context){
+    public double evaluate(DataRow tuple){
         double score = score_lof_async(model, tuple);
 
         //logger.info(String.format("score: %f minScore: %f, maxScore: %f", score, minScore, maxScore));
@@ -272,18 +249,7 @@ public class LOF {
         return score;
     }
 
-    private double evaluate_sync(DataRow tuple, DataFrame batch){
-        double score = score_lof_sync(batch, tuple);
 
-        score -= minScore;
-        if(score < 0) score = 0;
-
-        score /= (maxScore - minScore);
-
-        if(score > 1) score = 1;
-
-        return score;
-    }
 
     public double k_distance(DataFrame batch, DataRow o, int k){
         TupleTwo<DataRow, Double> kth = DistanceMeasureService.getKthNearestNeighbor(batch, o, k, distanceMeasure);
@@ -330,30 +296,5 @@ public class LOF {
         return lof;
     }
 
-    private static class MinPtsBounds{
-        private int lowerBound;
-        private int upperBound;
-
-        public void setLowerBound(int lowerBound) {
-            this.lowerBound = lowerBound;
-        }
-
-        public void setUpperBound(int upperBound) {
-            this.upperBound = upperBound;
-        }
-
-        public MinPtsBounds(int lowerBounds, int upperBounds){
-            lowerBound = lowerBounds;
-            upperBound = upperBounds;
-        }
-
-        public int getLowerBound(){
-            return lowerBound;
-        }
-
-        public int getUpperBound(){
-            return upperBound;
-        }
-    }
 
 }

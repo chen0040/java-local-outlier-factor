@@ -29,22 +29,6 @@ public class LDOF {
     @Setter(AccessLevel.NONE)
     private DataFrame model;
 
-    public void copy(LDOF that){
-        minPts = that.minPts;
-        anomalyCount = that.anomalyCount;
-        ldofLB = that.ldofLB;
-        distanceMeasure = that.distanceMeasure;
-        model = that.model == null ? null : that.model.makeCopy();
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        LDOF clone = (LDOF)super.clone();
-        clone.copy(this);
-
-        return clone;
-    }
-
     public LDOF(){
         super();
         minPts = 5;
@@ -85,14 +69,7 @@ public class LDOF {
         return avg_distance;
     }
 
-    public List<DataRow> toList(Collection<DataRow> tc){
-        List<DataRow> list = new ArrayList<DataRow>();
-        for(DataRow t : tc){
-            list.add(t);
-        }
 
-        return list;
-    }
 
     public double knn_inner_distance(DataFrame context, DataRow o, List<TupleTwo<DataRow, Double>> result){
         List<DataRow> nn = result.stream().map(TupleTwo::_1).collect(Collectors.toList());
@@ -120,13 +97,7 @@ public class LDOF {
         return knn_distance / knn_inner_distance;
     }
 
-    public boolean isAnomaly(DataRow tuple) {
-        return checkAnomaly(tuple);
-    }
 
-    public boolean checkAnomaly(DataRow tuple){
-        return local_distance_outlier_factor(model, tuple, minPts) > ldofLB; // recommended not to be invoked at this line
-    }
 
     public DataFrame getModel(){
         return model;
@@ -163,11 +134,5 @@ public class LDOF {
         }
 
         return this.getModel();
-    }
-
-    // the higher the ldof, the more likely the point is an outlier
-    public double evaluate(DataRow tuple, DataFrame context) {
-
-        return local_distance_outlier_factor(model, tuple, minPts);
     }
 }

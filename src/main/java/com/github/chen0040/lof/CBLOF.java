@@ -37,27 +37,6 @@ public class CBLOF {
     public double alpha;
     public double beta;
 
-    public void copy(CBLOF that){
-        
-        split = that.split;
-        discretizer = that.discretizer == null ? null : that.discretizer.makeCopy();
-
-        clusters = null;
-        if(that.clusters != null){
-            clusters = new ArrayList<>();
-            for(int i=0; i < that.clusters.size(); ++i){
-                clusters.add((Cluster)that.clusters.get(i).clone());
-            }
-        }
-    }
-
-    public CBLOF makeCopy(){
-        CBLOF clone = new CBLOF();
-        clone.copy(this);
-
-        return clone;
-    }
-
     public CBLOF(){
         super();
         KMeansDiscretizer d = new KMeansDiscretizer();
@@ -177,8 +156,7 @@ public class CBLOF {
 
         for(int i=0; i < m; ++i){
             DataRow tuple = dataFrame.row(i);
-            double score_lof = transform(tuple);
-            tuple.setCategoricalTargetCell("anomaly", score_lof > threshold ? "1" : "0");
+            tuple.setCategoricalTargetCell("anomaly", isAnomaly(tuple) ? "1" : "0");
         }
 
         return dataFrame;

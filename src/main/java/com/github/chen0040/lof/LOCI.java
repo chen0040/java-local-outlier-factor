@@ -18,7 +18,7 @@ import java.util.function.BiFunction;
  */
 @Getter
 @Setter
-public class LOCI implements Cloneable {
+public class LOCI {
     @Setter(AccessLevel.NONE)
     private double r_max;
 
@@ -30,21 +30,6 @@ public class LOCI implements Cloneable {
 
     private BiFunction<DataRow, DataRow, Double> distanceMeasure;
 
-    public void copy(LOCI that){
-        r_max = that.r_max;
-        alpha = that.alpha;
-        kSigma = that.kSigma;
-        distanceMatrix = that.distanceMatrix == null ? null : that.distanceMatrix.clone();
-        distanceMeasure = that.distanceMeasure;
-    }
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        LOCI clone = (LOCI)super.clone();
-        clone.copy(this);
-
-        return clone;
-    }
 
     public LOCI(){
     }
